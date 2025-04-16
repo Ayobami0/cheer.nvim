@@ -74,7 +74,7 @@ end
 --- loads the label into storage. should be called once
 --- @param opt ParseBufferOpt
 M.load = function(opt)
-	if state:is_loaded(opt) then
+	if state:is_loaded(opt.buf) then
 		return
 	end
 
@@ -91,7 +91,7 @@ M.update = function(opt)
 	local new_labels = parse_buffer(opt)
 	local old_labels = state:get(opt.buf)
 
-	if new_labels and #old_labels ~= 0 then
+	if new_labels then
 		if not vim.deep_equal(old_labels, new_labels) then
 			for _, l in ipairs(old_labels) do
 				if
@@ -100,6 +100,7 @@ M.update = function(opt)
 					end, { predicate = true })
 				then
 					cheer.cheer(l)
+          state:remove(opt.buf, l)
 				end
 			end
 			state:insert(opt.buf, new_labels)
