@@ -17,7 +17,7 @@ M.loaded = false
 ---@field labels table<string, LabelOptions|nil>
 ---@field ignore string[] file types to ignore
 local default = {
-	ignore = { "^$", "NvimTree", "Neogit*", "markdown" },
+	ignore = { "^$", "NvimTree", "Neogit*", "markdown", "COMMIT*", "Telescope*" },
 	cheer_format = "🎉 {label} {message} CLOSED!",
 	cheer_song = nil,
 	labels = {
