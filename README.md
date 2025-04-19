@@ -123,8 +123,8 @@ When you remove or comment out a line with a registered label (e.g., `-- TODO: f
 
 ## 🧪 TODOs
 
+- [ ] Implement better tracking for label (currently, all changes to labels are tracked, so any changes in insert mode shows a notification)
 - [ ] Add visual cheering animations (ASCII fireworks?).
-- [ ] Add Vimscript-compatible interface.
 
 ## 📁 File Structure
 
