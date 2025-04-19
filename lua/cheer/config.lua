@@ -30,7 +30,7 @@ M.loaded = false
 local default = {
 	player = { cmd = "mpv", args = { "--ao=pulse" } },
 	ignore = { "^$", "NvimTree", "Neogit*", "markdown", "COMMIT*", "Telescope*" },
-	cheer_format = "🎉 {label} {message} CLOSED!",
+	cheer_format = "🎉 {label} {message} CLOSED on line {line}!",
 	cheer_song = "cheer_applause",
 	labels = {
 		TODO = nil,

@@ -8,7 +8,8 @@ M.loaded = false
 ---@class Label
 ---@field name string
 ---@field message string
----@field file string
+---@field file? string
+---@field line? string
 
 ---@class ParseBufferOpt option specified to parse_buffer
 ---@field buf integer the buffer
@@ -17,6 +18,7 @@ M.loaded = false
 ---@class ParseLabelOpt option specified to parse_label
 ---@field text string the label text
 ---@field file string the name of the file where the label is
+---@field line integer the line where the label is
 
 ---parse text into tag data structure
 ---@param opt ParseLabelOpt
@@ -24,7 +26,7 @@ M.loaded = false
 local function parse_label(opt)
 	local pattern = "(%u+):%s*(.*)"
 	local name, message = string.match(opt.text, pattern)
-	return { name = name, message = message, file = opt.file }
+	return { name = name, message = message, file = opt.file, line = tostring(opt.line) }
 end
 
 ---Parse the tree and extract label, returns nil if treesitter is not enabled
@@ -34,7 +36,7 @@ local function parse_buffer(opt)
 	local ft = vim.bo.ft
 
 	for _, v in ipairs(config.options.ignore) do
-    local match = ft:find(v)
+		local match = ft:find(v)
 		if match then
 			return
 		end
@@ -48,8 +50,9 @@ local function parse_buffer(opt)
 	end
 
 	local tags = {}
-  local query
-	ok, query = pcall(vim.treesitter.query.parse,
+	local query
+	ok, query = pcall(
+		vim.treesitter.query.parse,
 		ft,
 		string.format('(((comment) @comment) (#any-match? @comment "%s:.*") )', config.regex_labels())
 	)
@@ -62,9 +65,10 @@ local function parse_buffer(opt)
 
 	for _, node, _ in query:iter_captures(tree:root(), 0) do
 		local text = vim.treesitter.get_node_text(node, opt.buf)
-
+		-- TODO:
+		local start_col, _, _, _ = node:range()
 		if text then
-			table.insert(tags, parse_label({ text = text, file = opt.file }))
+			table.insert(tags, parse_label({ text = text, file = opt.file, line = start_col + 1 }))
 		end
 	end
 
@@ -100,7 +104,7 @@ M.update = function(opt)
 					end, { predicate = true })
 				then
 					cheer.cheer(l)
-          state:remove(opt.buf, l)
+					state:remove(opt.buf, l)
 				end
 			end
 			state:insert(opt.buf, new_labels)

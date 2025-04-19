@@ -13,14 +13,8 @@ local function format_cheer(l)
 		return ""
 	end
 
-	local data = {
-		label = l.name,
-		message = l.message,
-		file = l.file,
-	}
-
 	local out = fmt:gsub("{(.-)}", function(key)
-		return data[key] or ""
+		return l[key] or ""
 	end)
 
 	return out
