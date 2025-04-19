@@ -11,15 +11,27 @@ M.loaded = false
 ---@field cheer_format string
 ---@field cheer_song string|nil
 
+---@alias cheer
+---| 'cheer_applause'
+---| 'cheer_clap'
+---| 'cheer_group'
+---| 'cheer_yay'
+
+---@class Player
+---@field cmd string
+---@field args string[]|nil
+
 ---@class Options
 ---@field cheer_format string
----@field cheer_song string|nil
+---@field cheer_song string|cheer|nil
 ---@field labels table<string, LabelOptions|nil>
 ---@field ignore string[] file types to ignore
+---@field player Player
 local default = {
+	player = { cmd = "mpv", args = { "--ao=pulse" } },
 	ignore = { "^$", "NvimTree", "Neogit*", "markdown", "COMMIT*", "Telescope*" },
 	cheer_format = "🎉 {label} {message} CLOSED!",
-	cheer_song = nil,
+	cheer_song = "cheer_applause",
 	labels = {
 		TODO = nil,
 		FIX = nil,
@@ -60,6 +72,23 @@ M.regex_labels = function()
 
 	local labels = table.concat(vim.tbl_keys(M.options.labels), "|")
 	return labels
+end
+
+M.get_cheer_path = function(c)
+	if not vim.tbl_contains({
+		"cheer_applause",
+		"cheer_clap",
+		"cheer_group",
+		"cheer_yay",
+	}, c) then
+		return c
+	end
+
+	local plugin_path = debug.getinfo(1).source:match("@?(.-)/lua/cheer/config%.lua$")
+
+	local cheer_file = string.format("%s/cheers/%s.mp3", plugin_path, c)
+
+	return cheer_file
 end
 
 return M
